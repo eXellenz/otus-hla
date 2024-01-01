@@ -1,0 +1,114 @@
+﻿/**
+*	JS | OTUS HLA | UTF8 | js/scriptCheckForm.js
+*	Home work
+*	eXellenz (eXellenz@inbox.ru)
+*	2023-12-25
+*/
+var elemRegForm			= $('#reg-form');
+var elemRegButton		= $('#reg-button');
+var elemRegLogin		= $('#reg-login');
+var elemRegPassword		= $('#reg-password');
+var elemRegName			= $('#reg-name');
+var elemRegLastname		= $('#reg-lastname');
+var elemRegAge			= $('#reg-age');
+var elemRegGender		= $('#reg-gender');
+var elemRegCity			= $('#reg-city');
+var elemRegAbout		= $('#reg-about');
+var elemAuthForm		= $('#auth-form');
+var elemAuthButton		= $('#auth-button');
+var elemAuthLogin		= $('#auth-login');
+var elemAuthPassword	= $('#auth-password');
+
+$(document).ready(function()
+{
+	if (elemRegForm) {elemRegForm.submit(ValidateRegFormSubmit);}
+	if (elemAuthForm) {elemAuthForm.submit(ValidateAuthFormSubmit);}
+});
+
+ValidateRegFormSubmit = function(e)
+{
+	e.preventDefault();
+
+	let validateIsOk	= true;
+	let	formMessage		= '';
+
+	if (!$.trim(elemRegLogin.val()))
+	{
+		validateIsOk = false;
+		formMessage += "Укажите Логин\r\n";
+	}
+	if (!$.trim(elemRegPassword.val()))
+	{
+		validateIsOk = false;
+		formMessage += "Укажите Пароль\r\n";
+	}
+	if (!$.trim(elemRegName.val()))
+	{
+		validateIsOk = false;
+		formMessage += "Укажите Имя\r\n";
+	}
+	if (!$.trim(elemRegLastname.val()))
+	{
+		validateIsOk = false;
+		formMessage += "Укажите Фамилия\r\n";
+	}
+	if (!$.trim(elemRegAge.val()))
+	{
+		validateIsOk = false;
+		formMessage += "Укажите Возраст\r\n";
+	}
+	if (!$.trim(elemRegGender.val()))
+	{
+		validateIsOk = false;
+		formMessage += "Укажите Пол\r\n";
+	}
+	if (!$.trim(elemRegCity.val()))
+	{
+		validateIsOk = false;
+		formMessage += "Укажите Город\r\n";
+	}
+	if (!$.trim(elemRegAbout.val()))
+	{
+		validateIsOk = false;
+		formMessage += "Укажите Интересы\r\n";
+	}
+
+	if (validateIsOk == false)
+	{
+		alert(formMessage);
+	}
+	else
+	{
+		elemRegButton.prop('disabled', true);
+		elemRegForm.unbind('submit').submit();
+	} 
+}
+
+ValidateAuthFormSubmit = function(e)
+{
+	e.preventDefault();
+
+	let validateIsOk	= true;
+	let	formMessage		= '';
+
+	if (!$.trim(elemAuthLogin.val()))
+	{
+		validateIsOk = false;
+		formMessage += "Укажите Логин\r\n";
+	}
+	if (!$.trim(elemAuthPassword.val()))
+	{
+		validateIsOk = false;
+		formMessage += "Укажите Пароль\r\n";
+	}
+
+	if (validateIsOk == false)
+	{
+		alert(formMessage);
+	}
+	else
+	{
+		elemAuthButton.prop('disabled', true);
+		elemAuthForm.unbind('submit').submit();
+	} 
+}

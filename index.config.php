@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
 *	PHP | OTUS HLA | UTF8 | index.config.php
 *	Home work
@@ -7,7 +7,7 @@
 */
 
 //====================================================================== CHECK
-if (!defined('OTUS'))
+if (!defined('ROOT'))
 {
 	print 'Access denided.';
 	exit(0);
@@ -16,10 +16,11 @@ if (!defined('OTUS'))
 //====================================================================== CONSTANTS
 define('DB_HOST',			'localhost');				// The host/ip to your SQL server
 define('DB_PORT',			'3306');					// The SQL port (Default: 3306)
-define('DB_USER',			'');	// The username
-define('DB_PASS',			'');	// The password
+define('DB_USER',			'user');				// The username
+define('DB_PASS',			'usersecret');		// The password
 define('DB_NAME',			'otushlahwdb');				// Database name
 define('DB_PREFIX',			'otushlahw_');				// The table prefix
+define('DB_CHARSET',		'utf8');					// Database charset
 define('DB_TABLE_USERS',	DB_PREFIX . 'users');		// Table name
 define('DB_TABLE_SESSIONS',	DB_PREFIX . 'sessions');	// Table name
 ?>
