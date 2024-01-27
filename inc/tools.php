@@ -3,7 +3,7 @@
 *	PHP | OTUS HLA | UTF8 | inc/tools.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
-*	2023-12-25
+*	2024-01-27
 */
 
 //====================================================================== CHECK
@@ -67,7 +67,7 @@ function db_connect(&$mysqli)
 					"`gender` varchar(12) NULL COMMENT 'User gender'," .
 					"`city` varchar(64) NULL COMMENT 'User city'," .
 					"`about` varchar(256) NULL COMMENT 'About user'," .
-					"PRIMARY KEY (uid))";
+					"PRIMARY KEY (uid)) ENGINE = INNODB;";
 		$result		= mysqli_query($mysqli, $myQuery);
 		if ($result === false)
 		{
@@ -93,7 +93,7 @@ function db_connect(&$mysqli)
 					"`uid` integer NULL COMMENT 'User ID'," .
 					"`timestamp` varchar(12) NULL COMMENT 'Session timestamp'," .
 					"`token` varchar(36) NULL COMMENT 'Session token'," .
-					"PRIMARY KEY (id))";
+					"PRIMARY KEY (id)) ENGINE = MYISAM;";
 		$result		= mysqli_query($mysqli, $myQuery);
 		if ($result === false)
 		{
@@ -206,6 +206,53 @@ function db_get_user_by_uid($mysqli, $uid)
 	$myQuery	= "SELECT `uid`, `login`, `password`, `name`, `lastname`, `age`, `gender`, `city`, `about` " .
 				"FROM `". DB_TABLE_USERS ."` " .
 				"WHERE `uid` = '" . $uid . "' " .
+				"ORDER BY `uid`";
+	$result		= mysqli_query($mysqli, $myQuery);
+	if ($result === false)
+	{
+		// Get mysqli error description
+		$queryError	= mysqli_error($mysqli);
+		// Return error description
+		return array('result' => false, 'payload' => 'Ошибка получения данных из ['. DB_TABLE_USERS .']. Описание: '. $queryError);
+	}
+	// If data exist
+	if($result->num_rows > 0)
+	{
+		// Transform object data to associative array
+		while (true)
+		{
+			$row	= mysqli_fetch_assoc($result);
+			if ($row)
+			{
+				$data[]	= $row;
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
+	// Db request result freeing
+	if (is_a($result, 'mysqli_result')) mysqli_free_result($result);
+	// Return success
+	return array('result' => true, 'payload' => $data);
+}
+
+function db_get_user_by_name_n_lastname($mysqli, $str)
+{
+	// Check $str lenght
+	if (mb_strlen($str) < 3)
+	{
+		// Return error description
+		return array('result' => false, 'payload' => 'Ошибка получения данных из ['. DB_TABLE_USERS .']. Описание: The request is too short. 3 and more symbols needed.');
+	}
+	// Variable declaration
+	$data	= array();
+	$search	= mysqli_real_escape_string($mysqli, $str);
+	// Request for getting data from table
+	$myQuery	= "SELECT `uid`, `login`, `password`, `name`, `lastname`, `age`, `gender`, `city`, `about` " .
+				"FROM `". DB_TABLE_USERS ."` " .
+				"WHERE `name` LIKE '" . $search . "%' AND `lastname` LIKE '" . $search . "%' " .
 				"ORDER BY `uid`";
 	$result		= mysqli_query($mysqli, $myQuery);
 	if ($result === false)

@@ -3,7 +3,7 @@
 *	PHP | OTUS HLA | UTF8 | index.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
-*	2023-12-25
+*	2024-01-27
 */
 
 //====================================================================== INIT
@@ -47,6 +47,8 @@ $sessionId		= 0;
 $sessionsCount	= 0;
 
 //====================================================================== MAIN
+// Set internal character encoding to UTF-8
+mb_internal_encoding("UTF-8");
 // Connect to db
 $arrDbRes	= db_connect($dbHandle);
 if ($arrDbRes['result'] === false)
@@ -72,6 +74,10 @@ if (isset($_GET['login']))
 else if (isset($_GET['adduser']))
 {
 	include 'inc/method.adduser.php';
+}
+else if (isset($_GET['search']) && $userId !== 0)
+{
+	include 'inc/method.search.php';
 }
 else if (isset($_GET['uid']) && $userId !== 0)
 {

@@ -2,7 +2,7 @@
 *	JS | OTUS HLA | UTF8 | js/scriptCheckForm.js
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
-*	2023-12-25
+*	2024-01-27
 */
 var elemRegForm			= $('#reg-form');
 var elemRegButton		= $('#reg-button');
@@ -18,11 +18,24 @@ var elemAuthForm		= $('#auth-form');
 var elemAuthButton		= $('#auth-button');
 var elemAuthLogin		= $('#auth-login');
 var elemAuthPassword	= $('#auth-password');
+var elemSearch			= $('#search-user');
+var elemSearchButton	= $('#search-button');
 
 $(document).ready(function()
 {
-	if (elemRegForm) {elemRegForm.submit(ValidateRegFormSubmit);}
-	if (elemAuthForm) {elemAuthForm.submit(ValidateAuthFormSubmit);}
+	if (elemRegForm)
+	{
+		elemRegForm.submit(ValidateRegFormSubmit);
+	}
+	if (elemAuthForm)
+	{
+		elemAuthForm.submit(ValidateAuthFormSubmit);
+	}
+	if (elemSearchButton)
+	{
+		elemSearchButton.prop('disabled', true);
+		$(document).on('change input keypress paste keyup', '#search-user', CatchSearchUser);
+	}
 });
 
 ValidateRegFormSubmit = function(e)
@@ -111,4 +124,18 @@ ValidateAuthFormSubmit = function(e)
 		elemAuthButton.prop('disabled', true);
 		elemAuthForm.unbind('submit').submit();
 	} 
+}
+
+CatchSearchUser = function()
+{
+	let strSearch	= elemSearch.val();
+	
+	if (strSearch.length >= 3)
+	{
+		elemSearchButton.prop('disabled', false);
+	}
+	else
+	{
+		elemSearchButton.prop('disabled', true);
+	}
 }

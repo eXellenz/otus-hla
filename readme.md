@@ -23,3 +23,7 @@
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Display user info by specified UserID<br/>
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id - UserID for current auth user
 </p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;/index.php?search<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Search user by specified string<br/>
+</p>

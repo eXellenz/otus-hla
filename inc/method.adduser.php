@@ -3,7 +3,7 @@
 *	PHP | OTUS HLA | UTF8 | inc/method.adduser.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
-*	2023-12-25
+*	2024-01-27
 */
 
 //====================================================================== CHECK
@@ -22,6 +22,7 @@ $rawAge			= $_POST['reg-age'];
 $rawGender		= $_POST['reg-gender'];
 $rawCity		= $_POST['reg-city'];
 $rawAbout		= $_POST['reg-about'];
+$existWarning	= '';
 
 //====================================================================== MAIN
 if (
@@ -44,7 +45,7 @@ if (
 	// Check for registering user login exist in db
 	if ($usersCount > 0)
 	{
-		page_move_to($dbHandle, $_SERVER['SCRIPT_NAME'] . '?adduser');
+		page_move_to($dbHandle, $_SERVER['SCRIPT_NAME'] . '?adduser&exist');
 	}
 	else
 	{
@@ -61,6 +62,10 @@ if (
 }
 else
 {
+	if (isset($_GET['exist']))
+	{
+		$existWarning	= 'Пользователь с таким логином существует!';
+	}
 	include 'tpl/adduser.tpl.php';
 }
 ?>

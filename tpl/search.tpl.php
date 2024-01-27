@@ -1,6 +1,6 @@
 ﻿<?php
 /**
-*	PHP | OTUS HLA | UTF8 | tpl/login.tpl.php
+*	PHP | OTUS HLA | UTF8 | tpl/search.tpl.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
 *	2024-01-27
@@ -18,7 +18,7 @@ if (!defined('ROOT'))
 <!DOCTYPE html>
 <html lang="ru-RU">
 	<head>
-		<title>Login...</title>
+		<title>Search...</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<meta name="robots" content="noindex,nofollow">
 		<meta name="viewport" content="width=device-width,initial-scale=1">
@@ -28,27 +28,28 @@ if (!defined('ROOT'))
 		<div>
 			<p>
 				<a href="<?php echo $_SERVER['SCRIPT_NAME']; ?>">Домашняя</a>
-				<a href="<?php echo $_SERVER['SCRIPT_NAME'] . '?adduser'; ?>">Регистрация</a>
+				<a href="<?php echo $_SERVER['SCRIPT_NAME'] . '?uid=' . $userId; ?>">Инфо о пользователе</a>
+				<a href="<?php echo $_SERVER['SCRIPT_NAME'] . '?login'; ?>">Авторизация</a>
 			</p>
 		</div>
 		<div>
-			<form id="auth-form" enctype="multipart/form-data" method="POST" action="<?php echo $_SERVER['SCRIPT_NAME'] . '?login'; ?>">
+			<form id="search-form" enctype="multipart/form-data" method="POST" action="<?php echo $_SERVER['SCRIPT_NAME'] . '?search'; ?>">
 				<table>
 					<tr>
-						<td>Логин: </td>
+						<td>Искать: </td>
 						<td><span style="color: red;">*</span></td>
-						<td><input id="auth-login" name="auth-login" type="text" /></td>
+						<td><input id="search-user" name="search-user" type="text" /></td>
 					</tr>
 					<tr>
-						<td>Пароль: </td>
-						<td><span style="color: red;">*</span></td>
-						<td><input id="auth-password" name="auth-password" type="text" /></td>
-					</tr>
-					<tr>
-						<td colspan="3"><button id="auth-button" type="submit">Отправить</button></td>
+						<td colspan="3"><button id="search-button" type="submit">Отправить</button></td>
 					</tr>
 				</table>
 			</form>
+		</div>
+		<div>
+			<table>
+				<?php echo $userTable; ?>
+			</table>
 		</div>
 		<script src="js/scriptCheckForm.js"></script>
 	</body>

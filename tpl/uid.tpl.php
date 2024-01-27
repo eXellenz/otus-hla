@@ -3,7 +3,7 @@
 *	PHP | OTUS HLA | UTF8 | tpl/uid.tpl.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
-*	2023-12-25
+*	2024-01-27
 */
 
 //====================================================================== CHECK
@@ -23,6 +23,13 @@ if (!defined('ROOT'))
 		<script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 	</head>
 	<body>
+		<div>
+			<p>
+				<a href="<?php echo $_SERVER['SCRIPT_NAME']; ?>">Домашняя</a>
+				<a href="<?php echo $_SERVER['SCRIPT_NAME'] . '?search'; ?>">Поиск пользователя</a>
+				<a href="<?php echo $_SERVER['SCRIPT_NAME'] . '?login'; ?>">Авторизация</a>
+			</p>
+		</div>
 		<div>
 			<table>
 				<tr>

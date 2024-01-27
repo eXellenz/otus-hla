@@ -3,7 +3,7 @@
 *	PHP | OTUS HLA | UTF8 | inc/method.uid.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
-*	2023-12-25
+*	2024-01-27
 */
 
 //====================================================================== CHECK
