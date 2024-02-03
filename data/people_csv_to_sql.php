@@ -12,6 +12,7 @@ date_default_timezone_set('Asia/Dubai');
 ob_implicit_flush(true);
 
 //====================================================================== PHP CUSTOM SETTINGS
+ini_set('max_execution_time',		0);
 ini_set('memory_limit',				'512M');
 ini_set('date.timezone',			'Asia/Dubai');
 ini_set('displaydbgs',				'On');
@@ -26,7 +27,7 @@ ini_set('error_log',				'people_csv_to_sql.error.log');
 define('ENDL',	chr(0x0D) . chr(0x0A));
 
 //====================================================================== DEPENDENCIES
-require_once '../../../../include/dionys/aliases.php';
+
 
 //====================================================================== VARIABLES
 $requestUri		= $_SERVER['REQUEST_URI'];
@@ -55,11 +56,10 @@ $myQuery		= "INSERT INTO `otushlahw_users` (" .
 				"'%s', " .
 				"'%s'" .
 				")";
-$csvStr			= '"%d","%s","%s","%s","%s","%d","%s","%s","%s"';
+$csvStr			= '"%s","%s","%s","%s","%d","%s","%s","%s"';
 $userPassword	= 'c3f9706602801cffec2cfb246bee0a85';
 $userGender		= 'VARIOUS';
 $userAbout		= 'Lorem ipsum dolor sit amet.';
-$index			= 3;
 
 //====================================================================== MAIN
 // Run over CLI
@@ -90,12 +90,12 @@ if (empty($requestUri))
 			$userLogin	= $userLoginOld . '.' . $j;
 		}
 
-		$myQueryArray[$userLogin]	= '1';
+		$myQueryArray[$userLogin]	= true;
 
 		$index ++;
 
 		file_put_contents($sqlName, sprintf($myQuery, $userLogin, $userPassword, $userName, $userLastname, $userAge, $userGender, $userCity, $userAbout) . ENDL, FILE_APPEND);
-		file_put_contents($csvName, sprintf($csvStr, $index, $userLogin, $userPassword, $userName, $userLastname, $userAge, $userGender, $userCity, $userAbout) . ENDL, FILE_APPEND);
+		file_put_contents($csvName, sprintf($csvStr, $userLogin, $userPassword, $userName, $userLastname, $userAge, $userGender, $userCity, $userAbout) . ENDL, FILE_APPEND);
 	}
 }
 else
@@ -128,5 +128,14 @@ function translit($value)
 	$value		= strtr($value, $converter);
 	
 	return $value;
+}
+
+function prompt_ex($msg) 
+{
+	print $msg . EOL;
+	ob_flush();
+	$in = fgets(fopen('php://stdin', 'r'), 1024);
+	fclose(fopen('php://stdin', 'r'));
+	exit();
 }
 ?>
