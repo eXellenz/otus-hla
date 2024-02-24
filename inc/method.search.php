@@ -28,7 +28,7 @@ $userTable	= '<tr>' . ENDL .
 //====================================================================== MAIN
 if (!empty($rawSearch))
 {
-	$arrDbRes	= db_get_user_by_name_n_lastname($dbHandles['read'], $rawSearch);
+	$arrDbRes	= db_get_user_by_name_or_lastname($dbHandles['read'], $rawSearch);
 	if ($arrDbRes['result'] === false)
 	{
 		page_break($dbHandles, '400 Bad Request', $arrDbRes['payload']);

@@ -281,7 +281,7 @@ function db_get_user_by_uid($mysqli, $uid)
 	return array('result' => true, 'payload' => $data);
 }
 
-function db_get_user_by_name_n_lastname($mysqli, $str)
+function db_get_user_by_name_or_lastname($mysqli, $str)
 {
 	// Check $str lenght
 	if (mb_strlen($str) < 3)
@@ -295,8 +295,9 @@ function db_get_user_by_name_n_lastname($mysqli, $str)
 	// Request for getting data from table
 	$myQuery	= "SELECT `uid`, `login`, `password`, `name`, `lastname`, `age`, `gender`, `city`, `about` " .
 				"FROM `". DB_TABLE_USERS ."` " .
-				"WHERE `name` LIKE '" . $search . "%' AND `lastname` LIKE '" . $search . "%' " .
-				"ORDER BY `uid`";
+				"WHERE `name` LIKE '" . $search . "%' OR `lastname` LIKE '" . $search . "%' " .
+				"ORDER BY `uid` " .
+				"LIMIT 100";
 	$result		= mysqli_query($mysqli, $myQuery);
 	if ($result === false)
 	{
