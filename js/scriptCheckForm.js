@@ -2,7 +2,7 @@
 *	JS | OTUS HLA | UTF8 | js/scriptCheckForm.js
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
-*	2024-01-27
+*	2024-02-24
 */
 var elemRegForm			= $('#reg-form');
 var elemRegButton		= $('#reg-button');

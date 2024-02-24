@@ -3,7 +3,7 @@
 *	PHP | OTUS HLA | UTF8 | inc/method.adduser.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
-*	2024-01-27
+*	2024-02-24
 */
 
 //====================================================================== CHECK
@@ -36,27 +36,27 @@ if (
 	!empty($rawAbout)
 )
 {
-	$arrDbRes	= db_get_user_by_login($dbHandle, $rawLogin);
+	$arrDbRes	= db_get_user_by_login($dbHandles['read'], $rawLogin);
 	if ($arrDbRes['result'] === false)
 	{
-		page_break($dbHandle, '400 Bad Request', $arrDbRes['payload']);
+		page_break($dbHandles, '400 Bad Request', $arrDbRes['payload']);
 	}
 	$usersCount	= count($arrDbRes['payload']);
 	// Check for registering user login exist in db
 	if ($usersCount > 0)
 	{
-		page_move_to($dbHandle, $_SERVER['SCRIPT_NAME'] . '?adduser&exist');
+		page_move_to($dbHandles, $_SERVER['SCRIPT_NAME'] . '?adduser&exist');
 	}
 	else
 	{
-		$arrDbRes	= db_add_user($dbHandle, $rawLogin, $rawPassword, $rawName, $rawLastname, $rawAge, $rawGender, $rawCity, $rawAbout);
+		$arrDbRes	= db_add_user($dbHandles['write'], $rawLogin, $rawPassword, $rawName, $rawLastname, $rawAge, $rawGender, $rawCity, $rawAbout);
 		if ($arrDbRes['result'] === false)
 		{
-			page_break($dbHandle, '400 Bad Request', $arrDbRes['payload']);
+			page_break($dbHandles, '400 Bad Request', $arrDbRes['payload']);
 		}
 		else
 		{
-			page_move_to($dbHandle, $_SERVER['SCRIPT_NAME'] . '?login');
+			page_move_to($dbHandles, $_SERVER['SCRIPT_NAME'] . '?login');
 		}
 	}
 }

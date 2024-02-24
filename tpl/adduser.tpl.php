@@ -3,7 +3,7 @@
 *	PHP | OTUS HLA | UTF8 | tpl/adduser.tpl.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
-*	2024-01-27
+*	2024-02-24
 */
 
 //====================================================================== CHECK

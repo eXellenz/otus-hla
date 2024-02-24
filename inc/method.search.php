@@ -3,7 +3,7 @@
 *	PHP | OTUS HLA | UTF8 | inc/method.search.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
-*	2024-01-27
+*	2024-02-24
 */
 
 //====================================================================== CHECK
@@ -28,10 +28,10 @@ $userTable	= '<tr>' . ENDL .
 //====================================================================== MAIN
 if (!empty($rawSearch))
 {
-	$arrDbRes	= db_get_user_by_name_n_lastname($dbHandle, $rawSearch);
+	$arrDbRes	= db_get_user_by_name_n_lastname($dbHandles['read'], $rawSearch);
 	if ($arrDbRes['result'] === false)
 	{
-		page_break($dbHandle, '400 Bad Request', $arrDbRes['payload']);
+		page_break($dbHandles, '400 Bad Request', $arrDbRes['payload']);
 	}
 	else
 	{

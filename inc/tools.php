@@ -3,7 +3,7 @@
 *	PHP | OTUS HLA | UTF8 | inc/tools.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
-*	2024-01-27
+*	2024-02-24
 */
 
 //====================================================================== CHECK
@@ -14,42 +14,85 @@ if (!defined('ROOT'))
 }
 
 //====================================================================== FUNCTIONS
-function db_connect(&$mysqli)
+function db_connect(&$mysqliArr)
 {
-	// Connecting to db
-	$mysqli	= mysqli_connect(DB_HOST . ':' . DB_PORT, DB_USER, DB_PASS);
-	$result	= mysqli_connect_errno();
-	if ($result !== 0)
+	$host	= '';
+	$port	= '';
+
+	foreach ($mysqliArr as $key => $value)
 	{
-		// Get mysqli error description
-		$queryError	= mysqli_connect_error();
-		// Close handle to db
-		if ($mysqli) db_close($mysqli);
-		// Return error description
-		return array('result' => false, 'payload' => 'Ошибка подключения к БД. Описание: '. $queryError);
+		switch ($key)
+		{
+			case 'write':
+			{
+				$host	= DB_MASTER_HOST;
+				$port	= DB_MASTER_PORT;
+				break;
+			}
+			case 'read':
+			{
+				$host	= DB_SLAVE_HOST;
+				$port	= DB_SLAVE_PORT;
+				break;
+			}
+			default:
+			{
+				return array('result' => false, 'payload' => 'Неизвестный тип БД: ' . $key);
+			}
+		}
+		// Connecting to db
+		$mysqliArr[$key]	= mysqli_connect($host . ':' . $port, DB_USER, DB_PASS);
+		$result				= mysqli_connect_errno();
+		if ($result !== 0)
+		{
+			// Get mysqli error description
+			$queryError	= mysqli_connect_error();
+			// Close handle to db
+			db_close($mysqliArr);
+			// Return error description
+			return array('result' => false, 'payload' => 'Ошибка подключения к [' . $key . '] БД. Описание: '. $queryError);
+		}
+		// Charset setting
+		$result	= mysqli_set_charset($mysqliArr[$key], DB_CHARSET);
+		if ($result === false)
+		{
+			// Get mysqli error description
+			$queryError	= mysqli_error($mysqliArr[$key]);
+			// Close handle to db
+			db_close($mysqliArr);
+			// Return error description
+			return array('result' => false, 'payload' => 'Ошибка установка кодировки [' . $key . '] БД. Описание: '. $queryError);
+		}
+		// db select
+		$result	= mysqli_select_db($mysqliArr[$key], DB_NAME);
+		if ($result === false)
+		{
+			// Get mysqli error description
+			$queryError	= mysqli_error($mysqliArr[$key]);
+			// Close handle to db
+			db_close($mysqliArr);
+			// Return error description
+			return array('result' => false, 'payload' => 'Ошибка подключения к [' . $key . ']['. DB_NAME .']. Описание: '. $queryError);
+		}
 	}
-	// Charset setting
-	$result	= mysqli_set_charset($mysqli, DB_CHARSET);
-	if ($result === false)
+	// Return success
+	return array('result' => true, 'payload' => 'done');
+}
+
+function db_close(&$mysqliArr)
+{
+	foreach ($mysqliArr as $key => $value)
 	{
-		// Get mysqli error description
-		$queryError	= mysqli_error($mysqli);
-		// Close handle to db
-		if ($mysqli) db_close($mysqli);
-		// Return error description
-		return array('result' => false, 'payload' => 'Ошибка установка кодировки БД. Описание: '. $queryError);
+		if ($mysqliArr[$key])
+		{
+			mysqli_close($mysqliArr[$key]);
+			$mysqliArr[$key]	= null;
+		}
 	}
-	// db select
-	$result	= mysqli_select_db($mysqli, DB_NAME);
-	if ($result === false)
-	{
-		// Get mysqli error description
-		$queryError	= mysqli_error($mysqli);
-		// Close handle to db
-		if ($mysqli) db_close($mysqli);
-		// Return error description
-		return array('result' => false, 'payload' => 'Ошибка подключения к ['. DB_NAME .']. Описание: '. $queryError);
-	}
+}
+
+function db_table_init($mysqli)
+{
 	// Check for DB_TABLE_USERS exist
 	$myQuery	= "SELECT 1 FROM `". DB_TABLE_USERS ."` WHERE 0";
 	$result		= mysqli_query($mysqli, $myQuery);
@@ -80,7 +123,10 @@ function db_connect(&$mysqli)
 		}
 	}
 	// Db request result freeing
-	if (is_a($result, 'mysqli_result')) mysqli_free_result($result);
+	if (is_a($result, 'mysqli_result'))
+	{
+		mysqli_free_result($result);
+	}
 	// Check for DB_TABLE_SESSIONS exist
 	$myQuery	= "SELECT 1 FROM `". DB_TABLE_SESSIONS ."` WHERE 0";
 	$result		= mysqli_query($mysqli, $myQuery);
@@ -106,15 +152,12 @@ function db_connect(&$mysqli)
 		}
 	}
 	// Db request result freeing
-	if (is_a($result, 'mysqli_result')) mysqli_free_result($result);
+	if (is_a($result, 'mysqli_result'))
+	{
+		mysqli_free_result($result);
+	}
 	// Return success
 	return array('result' => true, 'payload' => 'done');
-}
-
-function db_close(&$mysqli)
-{
-	mysqli_close($mysqli);
-	$mysqli	= null;
 }
 
 function db_add_user($mysqli, $rawLogin, $rawPassword, $rawName, $rawLastname, $rawAge, $rawGender, $rawCity, $rawAbout)
@@ -321,45 +364,6 @@ function db_set_session($mysqli, $uid, $timestamp, $token, $id = 0)
 	return array('result' => true, 'payload' => 'done');
 }
 
-function db_get_session_by_uid($mysqli, $uid)
-{
-	$data	= array();
-	// Request for getting data from table
-	$myQuery	= "SELECT `id`, `uid`, `timestamp`, `token` " .
-				"FROM `". DB_TABLE_SESSIONS ."` " .
-				"WHERE `uid` = " . $uid . " " .
-				"ORDER BY `uid`";
-	$result		= mysqli_query($mysqli, $myQuery);
-	if ($result === false)
-	{
-		// Get mysqli error description
-		$queryError	= mysqli_error($mysqli);
-		// Return error description
-		return array('result' => false, 'payload' => 'Ошибка получения данных из ['. DB_TABLE_SESSIONS .']. Описание: '. $queryError);
-	}
-	// If data exist
-	if($result->num_rows > 0)
-	{
-		// Transform object data to associative array
-		while (true)
-		{
-			$row	= mysqli_fetch_assoc($result);
-			if ($row)
-			{
-				$data[]	= $row;
-			}
-			else
-			{
-				break;
-			}
-		}
-	}
-	// Db request result freeing
-	if (is_a($result, 'mysqli_result')) mysqli_free_result($result);
-	// Return success
-	return array('result' => true, 'payload' => $data);
-}
-
 function db_get_session_by_token($mysqli, $rawToken)
 {
 	$token	= mysqli_real_escape_string($mysqli, $rawToken);
@@ -400,7 +404,46 @@ function db_get_session_by_token($mysqli, $rawToken)
 	return array('result' => true, 'payload' => $data);
 }
 
-function db_delete_by_id($id, $tableName)
+function db_get_session_by_uid($mysqli, $uid)
+{
+	$data	= array();
+	// Request for getting data from table
+	$myQuery	= "SELECT `id`, `uid`, `timestamp`, `token` " .
+				"FROM `". DB_TABLE_SESSIONS ."` " .
+				"WHERE `uid` = " . $uid . " " .
+				"ORDER BY `uid`";
+	$result		= mysqli_query($mysqli, $myQuery);
+	if ($result === false)
+	{
+		// Get mysqli error description
+		$queryError	= mysqli_error($mysqli);
+		// Return error description
+		return array('result' => false, 'payload' => 'Ошибка получения данных из ['. DB_TABLE_SESSIONS .']. Описание: '. $queryError);
+	}
+	// If data exist
+	if($result->num_rows > 0)
+	{
+		// Transform object data to associative array
+		while (true)
+		{
+			$row	= mysqli_fetch_assoc($result);
+			if ($row)
+			{
+				$data[]	= $row;
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
+	// Db request result freeing
+	if (is_a($result, 'mysqli_result')) mysqli_free_result($result);
+	// Return success
+	return array('result' => true, 'payload' => $data);
+}
+
+function db_delete_by_id($mysqli, $id, $tableName)
 {
 	// Check for data exist
 	$myQuery	= "SELECT id FROM `" . $tableName . "` WHERE `id` = " . $id;
@@ -425,15 +468,15 @@ function db_delete_by_id($id, $tableName)
 	return array('result' => true, 'payload' => 'done');
 }
 
-function page_move_to(&$mysqli, $url)
+function page_move_to(&$mysqliArr, $url)
 {
 	// Close handle to db
-	if ($mysqli) db_close($mysqli);
+	db_close($mysqliArr);
 	// Move to $url
 	header('Location: ' . $url);
 }
 
-function page_break(&$mysqli, $httpFullCode, $message)
+function page_break(&$mysqliArr, $httpFullCode, $message)
 {
 	$responseHdr	= array(
 							$_SERVER['SERVER_PROTOCOL'] . ' ' . $httpFullCode,
@@ -442,7 +485,7 @@ function page_break(&$mysqli, $httpFullCode, $message)
 					);
 	$responseMsg	= $message;
 	// Close handle to db
-	if ($mysqli) db_close($mysqli);
+	db_close($mysqliArr);
 	// Response to client and close connecting
 	response_and_close_connect($responseMsg, $responseHdr);
 	// Exit code proccess

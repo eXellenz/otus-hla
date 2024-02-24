@@ -3,7 +3,7 @@
 *	PHP | OTUS HLA | UTF8 | index.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
-*	2024-01-27
+*	2024-02-24
 */
 
 //====================================================================== INIT
@@ -33,7 +33,7 @@ require_once 'index.config.php';
 require_once 'inc/tools.php';
 
 //====================================================================== VARIABLES
-$dbHandle		= null;
+$dbHandles		= array('write' => null, 'read' => null);
 $arrDbRes		= array('result' => false, 'payload' => 'initial');
 $responseMsg	= '';
 $responseHdr	= array();
@@ -50,16 +50,22 @@ $sessionsCount	= 0;
 // Set internal character encoding to UTF-8
 mb_internal_encoding("UTF-8");
 // Connect to db
-$arrDbRes	= db_connect($dbHandle);
+$arrDbRes	= db_connect($dbHandles);
 if ($arrDbRes['result'] === false)
 {
-	page_break($dbHandle, '500 Internal Server Error', $arrDbRes['payload']);
+	page_break($dbHandles, '500 Internal Server Error', $arrDbRes['payload']);
+}
+// Init tables
+$arrDbRes	= db_table_init($dbHandles['write']);
+if ($arrDbRes['result'] === false)
+{
+	page_break($dbHandles, '500 Internal Server Error', $arrDbRes['payload']);
 }
 // Get user id by coockie token
-$arrDbRes	= db_get_session_by_token($dbHandle, (empty($tokenCookie) ? 'nothing' : $tokenCookie));
+$arrDbRes	= db_get_session_by_token($dbHandles['read'], (empty($tokenCookie) ? 'nothing' : $tokenCookie));
 if ($arrDbRes['result'] === false)
 {
-	page_break($dbHandle, '400 Bad Request', $arrDbRes['payload']);
+	page_break($dbHandles, '400 Bad Request', $arrDbRes['payload']);
 }
 $sessionsCount	= count($arrDbRes['payload']);
 if ($sessionsCount > 0)
@@ -88,14 +94,14 @@ else
 	if ($userId === 0)
 	{
 		// Move to ?login
-		page_move_to($dbHandle, $_SERVER['SCRIPT_NAME'] . '?login');
+		page_move_to($dbHandles, $_SERVER['SCRIPT_NAME'] . '?login');
 	}
 	else
 	{
 		// Move to ?uid=
-		page_move_to($dbHandle, $_SERVER['SCRIPT_NAME'] . '?uid=' . $userId);
+		page_move_to($dbHandles, $_SERVER['SCRIPT_NAME'] . '?uid=' . $userId);
 	}
 }
 // Close handle to db
-if ($dbHandle) db_close($dbHandle);
+db_close($dbHandles);
 ?>

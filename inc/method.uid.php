@@ -3,7 +3,7 @@
 *	PHP | OTUS HLA | UTF8 | inc/method.uid.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
-*	2024-01-27
+*	2024-02-24
 */
 
 //====================================================================== CHECK
@@ -23,10 +23,10 @@ $userCity		= 'User not found';
 $userAbout		= 'User not found';
 
 //====================================================================== MAIN
-$arrDbRes	= db_get_user_by_uid($dbHandle, $userIdGet);
+$arrDbRes	= db_get_user_by_uid($dbHandles['read'], $userIdGet);
 if ($arrDbRes['result'] === false)
 {
-	page_break($dbHandle, '400 Bad Request', $arrDbRes['payload']);
+	page_break($dbHandles, '400 Bad Request', $arrDbRes['payload']);
 }
 $usersCount	= count($arrDbRes['payload']);
 // Check for requested user id exist in db
