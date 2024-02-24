@@ -56,6 +56,22 @@ if (!defined('ROOT'))
 					<td>Интересы: </td>
 					<td><?php echo $userAbout; ?></td>
 				</tr>
+				<tr>
+					<td>Друзья: </td>
+					<td>
+						<table>
+								<?php
+								foreach ($userFriends as $key => $value)
+								{
+									echo	'							<tr>' . ENDL .
+											'								<td>' . $key . '</td>' . ENDL .
+											'								<td>' . $value . '</td>'  . ENDL .
+											'							</tr>'  . ENDL;
+								}
+								?>
+						</table>
+					</td>
+				</tr>
 			</table>
 		</div>
 	</body>

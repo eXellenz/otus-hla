@@ -21,6 +21,7 @@ $userAge		= 'User not found';
 $userGender		= 'User not found';
 $userCity		= 'User not found';
 $userAbout		= 'User not found';
+$userFriends	= array();
 
 //====================================================================== MAIN
 $arrDbRes	= db_get_user_by_uid($dbHandles['read'], $userIdGet);
@@ -38,6 +39,7 @@ if ($usersCount > 0)
 	$userGender		= $arrDbRes['payload'][0]['gender'];
 	$userCity		= $arrDbRes['payload'][0]['city'];
 	$userAbout		= $arrDbRes['payload'][0]['about'];
+	$userFriends	= cache_get_friends($dbHandles['read'], $userIdGet);
 }
 include 'tpl/uid.tpl.php';
 ?>

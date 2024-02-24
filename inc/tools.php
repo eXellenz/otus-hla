@@ -93,68 +93,109 @@ function db_close(&$mysqliArr)
 
 function db_table_init($mysqli)
 {
-	// Check for DB_TABLE_USERS exist
-	$myQuery	= "SELECT 1 FROM `". DB_TABLE_USERS ."` WHERE 0";
-	$result		= mysqli_query($mysqli, $myQuery);
-	// If table not exist
-	if ($result === false)
+	// Init table list
+	$dbTableList	= array(
+						DB_TABLE_USERS,
+						DB_TABLE_SESSIONS,
+						DB_TABLE_FRIENDS,
+						DB_TABLE_POSTS,
+						DB_TABLE_DIALOGS
+				);
+	$dbTableListCnt	= count($dbTableList);
+	// Table list walker
+	for ($i = 0; $i < $dbTableListCnt; $i ++)
 	{
-		// Request for create table
-		$myQuery	= "CREATE TABLE `" . DB_TABLE_USERS . "` (" .
-					"`uid` integer NULL AUTO_INCREMENT COMMENT 'User ID'," .
-					"`login` varchar(64) NULL COMMENT 'User name'," .
-					"`password` varchar(64) NULL COMMENT 'User lastname'," .
-					"`name` varchar(64) NULL COMMENT 'User name'," .
-					"`lastname` varchar(64) NULL COMMENT 'User lastname'," .
-					"`age` integer NULL COMMENT 'User age'," .
-					"`gender` varchar(12) NULL COMMENT 'User gender'," .
-					"`city` varchar(64) NULL COMMENT 'User city'," .
-					"`about` varchar(256) NULL COMMENT 'About user'," .
-					"PRIMARY KEY (uid)) ENGINE = INNODB;";
-		$result		= mysqli_query($mysqli, $myQuery);
+		$myQueryCheck	= '';
+		$myQueryCreate	= '';
+		$dbName			= $dbTableList[$i];
+		// Create query string
+		switch($dbName)
+		{
+			case DB_TABLE_USERS:
+			{
+				$myQueryCreate	= "CREATE TABLE `" . $dbName . "` (" .
+								"`uid` integer NULL AUTO_INCREMENT COMMENT 'User ID'," .
+								"`login` varchar(64) NULL COMMENT 'User name'," .
+								"`password` varchar(64) NULL COMMENT 'User lastname'," .
+								"`name` varchar(64) NULL COMMENT 'User name'," .
+								"`lastname` varchar(64) NULL COMMENT 'User lastname'," .
+								"`age` integer NULL COMMENT 'User age'," .
+								"`gender` varchar(12) NULL COMMENT 'User gender'," .
+								"`city` varchar(64) NULL COMMENT 'User city'," .
+								"`about` varchar(256) NULL COMMENT 'About user'," .
+								"PRIMARY KEY (uid)) ENGINE = INNODB;";
+				break;
+			}
+			case DB_TABLE_SESSIONS:
+			{
+				$myQueryCreate	= "CREATE TABLE `" . $dbName . "` (" .
+								"`id` integer NULL AUTO_INCREMENT COMMENT 'ID записи'," .
+								"`uid` integer NULL COMMENT 'User ID'," .
+								"`timestamp` varchar(12) NULL COMMENT 'Session timestamp'," .
+								"`token` varchar(36) NULL COMMENT 'Session token'," .
+								"PRIMARY KEY (id)) ENGINE = INNODB;";
+				break;
+			}
+			case DB_TABLE_FRIENDS:
+			{
+				$myQueryCreate	= "CREATE TABLE `" . $dbName . "` (" .
+								"`id` integer NULL AUTO_INCREMENT COMMENT 'ID записи'," .
+								"`timestamp` varchar(12) NULL COMMENT 'Add timestamp'," .
+								"`uid` integer NULL COMMENT 'User ID'," .
+								"`fid` integer NULL COMMENT 'Friend ID'," .
+								"PRIMARY KEY (id)) ENGINE = INNODB;";
+				break;
+			}
+			case DB_TABLE_POSTS:
+			{
+				$myQueryCreate	= "CREATE TABLE `" . $dbName . "` (" .
+								"`id` integer NULL AUTO_INCREMENT COMMENT 'ID записи'," .
+								"`timestamp` varchar(12) NULL COMMENT 'Add timestamp'," .
+								"`uid` integer NULL COMMENT 'User ID'," .
+								"`title` varchar(128) NULL COMMENT 'Post title'," .
+								"`post` text NULL COMMENT 'Post content'," .
+								"PRIMARY KEY (id)) ENGINE = INNODB;";
+				break;
+			}
+			case DB_TABLE_DIALOGS:
+			{
+				$myQueryCreate	= "CREATE TABLE `" . $dbName . "` (" .
+								"`id` integer NULL AUTO_INCREMENT COMMENT 'ID записи'," .
+								"`timestamp` varchar(12) NULL COMMENT 'Add timestamp'," .
+								"`uid` integer NULL COMMENT 'User ID'," .
+								"`tid` integer NULL COMMENT 'Target ID'," .
+								"`message` text NULL COMMENT 'Message content'," .
+								"PRIMARY KEY (id)) ENGINE = INNODB;";
+				break;
+			}
+			default:
+			{
+				return array('result' => false, 'payload' => 'Ошибка проверки ['. $dbName .']. Описание: Имя БД не известно.');
+			}
+		}
+		// Check for exist
+		$myQueryCheck	= "SELECT 1 FROM `". $dbName ."` WHERE 0";
+		$result			= mysqli_query($mysqli, $myQueryCheck);
+		// If table not exist
 		if ($result === false)
 		{
-			// Get mysqli error description
-			$queryError	= mysqli_error($mysqli);
-			// Close handle to db
-			if ($mysqli) db_close($mysqli);
-			// Return error description
-			return array('result' => false, 'payload' => 'Ошибка создания ['. DB_TABLE_USERS .']. Описание: '. $queryError);
+			// Request for create table
+			$result		= mysqli_query($mysqli, $myQueryCreate);
+			if ($result === false)
+			{
+				// Get mysqli error description
+				$queryError	= mysqli_error($mysqli);
+				// Close handle to db
+				if ($mysqli) db_close($mysqli);
+				// Return error description
+				return array('result' => false, 'payload' => 'Ошибка создания ['. $dbName .']. Описание: '. $queryError);
+			}
 		}
-	}
-	// Db request result freeing
-	if (is_a($result, 'mysqli_result'))
-	{
-		mysqli_free_result($result);
-	}
-	// Check for DB_TABLE_SESSIONS exist
-	$myQuery	= "SELECT 1 FROM `". DB_TABLE_SESSIONS ."` WHERE 0";
-	$result		= mysqli_query($mysqli, $myQuery);
-	// If table not exist
-	if ($result === false)
-	{
-		// Request for create table
-		$myQuery	= "CREATE TABLE `" . DB_TABLE_SESSIONS . "` (" .
-					"`id` integer NULL AUTO_INCREMENT COMMENT 'ID записи'," .
-					"`uid` integer NULL COMMENT 'User ID'," .
-					"`timestamp` varchar(12) NULL COMMENT 'Session timestamp'," .
-					"`token` varchar(36) NULL COMMENT 'Session token'," .
-					"PRIMARY KEY (id)) ENGINE = MYISAM;";
-		$result		= mysqli_query($mysqli, $myQuery);
-		if ($result === false)
+		// Db request result freeing
+		if (is_a($result, 'mysqli_result'))
 		{
-			// Get mysqli error description
-			$queryError	= mysqli_error($mysqli);
-			// Close handle to db
-			if ($mysqli) db_close($mysqli);
-			// Return error description
-			return array('result' => false, 'payload' => 'Ошибка создания ['. DB_TABLE_SESSIONS .']. Описание: '. $queryError);
+			mysqli_free_result($result);
 		}
-	}
-	// Db request result freeing
-	if (is_a($result, 'mysqli_result'))
-	{
-		mysqli_free_result($result);
 	}
 	// Return success
 	return array('result' => true, 'payload' => 'done');
@@ -242,14 +283,46 @@ function db_get_user_by_login($mysqli, $rawLogin)
 	return array('result' => true, 'payload' => $data);
 }
 
-function db_get_user_by_uid($mysqli, $uid)
+function db_get_user_by_uid($mysqli, $rawUid)
 {
 	$data	= array();
 	// Request for getting data from table
-	$myQuery	= "SELECT `uid`, `login`, `password`, `name`, `lastname`, `age`, `gender`, `city`, `about` " .
-				"FROM `". DB_TABLE_USERS ."` " .
-				"WHERE `uid` = '" . $uid . "' " .
-				"ORDER BY `uid`";
+	if (is_array($rawUid))
+	{
+		$uidCnt	= count($rawUid);
+		if ($uidCnt > 0)
+		{
+			$myQuery	= "SELECT `uid`, `login`, `password`, `name`, `lastname`, `age`, `gender`, `city`, `about` " .
+						"FROM `". DB_TABLE_USERS ."` " .
+						"WHERE ";
+			for ($i = 0; $i < $uidCnt; $i ++)
+			{
+				$uid	= mysqli_real_escape_string($mysqli, $rawUid[$i]);
+				if ($i == 0)
+				{
+					$myQuery	.= "`uid` = '" . $uid . "' ";
+				}
+				else
+				{
+					$myQuery	.= "OR `uid` = '" . $uid . "' ";
+				}
+			}
+			$myQuery	.= "ORDER BY `uid`";
+		}
+		else
+		{
+			// Return error description
+			return array('result' => false, 'payload' => 'Ошибка получения данных из ['. DB_TABLE_USERS .']. Описание: Не передан User ID.');
+		}
+	}
+	else
+	{
+		$uid		= mysqli_real_escape_string($mysqli, $rawUid);
+		$myQuery	= "SELECT `uid`, `login`, `password`, `name`, `lastname`, `age`, `gender`, `city`, `about` " .
+					"FROM `". DB_TABLE_USERS ."` " .
+					"WHERE `uid` = '" . $uid . "' " .
+					"ORDER BY `uid`";
+	}
 	$result		= mysqli_query($mysqli, $myQuery);
 	if ($result === false)
 	{
@@ -444,27 +517,217 @@ function db_get_session_by_uid($mysqli, $uid)
 	return array('result' => true, 'payload' => $data);
 }
 
-function db_delete_by_id($mysqli, $id, $tableName)
+function db_get_friend_by_uid($mysqli, $rawUid, $rawFid = '')
 {
-	// Check for data exist
-	$myQuery	= "SELECT id FROM `" . $tableName . "` WHERE `id` = " . $id;
+	$uid	= mysqli_real_escape_string($mysqli, $rawUid);
+	$data	= array();
+	// Request for getting data from table
+	$myQuery	= "SELECT `fid` " .
+				"FROM `". DB_TABLE_FRIENDS ."` " .
+				"WHERE `uid` = '" . $uid . "' " .
+				(empty($rawFid) ? '' : "AND `fid` = '" . mysqli_real_escape_string($mysqli, $rawFid) . "' ") .
+				"ORDER BY `fid`";
 	$result		= mysqli_query($mysqli, $myQuery);
 	if ($result === false)
 	{
 		// Get mysqli error description
 		$queryError	= mysqli_error($mysqli);
 		// Return error description
-		return array('result' => false, 'payload' => 'Ошибка получения данных из ['. $tableName .']. Описание: '. $queryError);
+		return array('result' => false, 'payload' => 'Ошибка получения данных из ['. DB_TABLE_FRIENDS .']. Описание: '. $queryError);
 	}
 	// If data exist
 	if($result->num_rows > 0)
 	{
-		// Db request result freeing
-		if (is_a($result, 'mysqli_result')) mysqli_free_result($result);
-		// Request for deleting data from table
-		$myQuery	= "DELETE FROM `" . $tableName . "` WHERE `id` = " . $id;
-		$result		= mysqli_query($mysqli, $myQuery);
+		// Transform object data to associative array
+		while (true)
+		{
+			$row	= mysqli_fetch_assoc($result);
+			if ($row)
+			{
+				$data[]	= $row;
+			}
+			else
+			{
+				break;
+			}
+		}
 	}
+	// Db request result freeing
+	if (is_a($result, 'mysqli_result')) mysqli_free_result($result);
+	// Return success
+	return array('result' => true, 'payload' => $data);
+}
+
+function db_add_friend_to_uid($mysqli, $rawUid, $rawFid)
+{
+	// Check for friend exist
+	$dbRes	= db_get_friend_by_uid($mysqli, $rawUid, $rawFid);
+	// Check result
+	if ($dbRes['result'] === false)
+	{
+		return $dbRes;
+	}
+	// Calculate result
+	$count	= count($dbRes['payload']);
+	if ($count > 0)
+	{
+		return array('result' => false, 'payload' => 'Ошибка добавления друга. Описание: Друг уже добавлен.');
+	}
+	// Check for user exist
+	$dbRes	= db_get_user_by_uid($mysqli, $rawFid);
+	// Check result
+	if ($dbRes['result'] === false)
+	{
+		return $dbRes;
+	}
+	// Calculate result
+	$count	= count($dbRes['payload']);
+	if ($count === 0)
+	{
+		return array('result' => false, 'payload' => 'Ошибка добавления друга. Описание: Пользователь не существует.');
+	}
+	// Add friend
+	$myQuery	= "INSERT INTO `" . DB_TABLE_FRIENDS . "` (" .
+					"`timestamp`, " .
+					"`uid`, " .
+					"`fid`" .
+					") VALUES (" .
+					"'" . time() . "', " .
+					"'" . mysqli_real_escape_string($mysqli, $rawUid) . "', " .
+					"'" . mysqli_real_escape_string($mysqli, $rawFid) . "'" .
+					")";
+	$result		= mysqli_query($mysqli, $myQuery);
+	if ($result === false)
+	{
+		// Get mysqli error description
+		$queryError	= mysqli_error($mysqli);
+		// Return error description
+		return array('result' => false, 'payload' => 'Ошибка вставки данных в ['. DB_TABLE_FRIENDS .']. Описание: '. $queryError);
+	}
+	// Update cache record
+	$dbRes	= cache_update_friends($mysqli, $rawUid);
+	// Check result
+	if ($dbRes['result'] === false)
+	{
+		return $dbRes;
+	}
+	// Return success
+	return array('result' => true, 'payload' => 'done');
+}
+
+function db_delete_friend_from_uid($mysqli, $rawUid, $rawFid)
+{
+	// Check for friend exist
+	$dbRes	= db_get_friend_by_uid($mysqli, $rawUid, $rawFid);
+	// Check result
+	if ($dbRes['result'] === false)
+	{
+		return $dbRes;
+	}
+	// Calculate result
+	$count	= count($dbRes['payload']);
+	if ($count === 0)
+	{
+		return array('result' => false, 'payload' => 'Ошибка добавления друга. Описание: Друг не существует.');
+	}
+	// Delete friend
+	$myQuery	= "DELETE FROM `" . DB_TABLE_FRIENDS . "` " .
+				"WHERE `uid` = '" . mysqli_real_escape_string($mysqli, $rawUid) . "' AND `fid` = '" . mysqli_real_escape_string($mysqli, $rawFid) . "'";
+	$result		= mysqli_query($mysqli, $myQuery);
+	if ($result === false)
+	{
+		// Get mysqli error description
+		$queryError	= mysqli_error($mysqli);
+		// Return error description
+		return array('result' => false, 'payload' => 'Ошибка удаления данных из ['. DB_TABLE_FRIENDS .']. Описание: '. $queryError);
+	}
+	// Update cache record
+	$dbRes	= cache_update_friends($mysqli, $rawUid);
+	// Check result
+	if ($dbRes['result'] === false)
+	{
+		return $dbRes;
+	}
+	// Return success
+	return array('result' => true, 'payload' => 'done');
+}
+
+function cache_get_friends($mysqli, $uid)
+{
+	$data		= array();
+	$dbRes		= array();
+	$key		= 'otus-hla-friends-' . $uid;
+	$ttl		= 3600 * 24;
+	// cache record exist check
+	$keyInfo	= apcu_key_info($key);
+	// record not exist
+	if ($keyInfo === null)
+	{
+		// Get Friend ID for User ID
+		$dbRes	= db_get_friend_by_uid($mysqli, $uid);
+		// Check result
+		if ($dbRes['result'] === false)
+		{
+			return array('null'	=> $dbRes['payload']);
+		}
+		// Create Friend ID list array
+		foreach ($dbRes['payload'] as $value)
+		{
+			$data[]	= $value['fid'];
+		}
+		// Get user data for Friend ID list array
+		$dbRes	= db_get_user_by_uid($mysqli, $data);
+		// Check result
+		if ($dbRes['result'] === false)
+		{
+			return array('null'	=> $dbRes['payload']);
+		}
+		// Create friends list array
+		$data	= array();
+		foreach ($dbRes['payload'] as $value)
+		{
+			$data[$value['uid']]	= $value['lastname'] . ' ' . $value['name'];
+		}
+		// Store friends list array to cache
+		apcu_store($key, $data, $ttl);
+	}
+	// Cached record return
+	return apcu_fetch($key);
+}
+
+function cache_update_friends($mysqli, $uid)
+{
+	$data		= array();
+	$dbRes		= array();
+	$key		= 'otus-hla-friends-' . $uid;
+	$ttl		= 3600 * 24;
+	// Get Friend ID for User ID
+	$dbRes	= db_get_friend_by_uid($mysqli, $uid);
+	// Check result
+	if ($dbRes['result'] === false)
+	{
+		return $dbRes;
+	}
+	// Create Friend ID list array
+	foreach ($dbRes['payload'] as $value)
+	{
+		$data[]	= $value['fid'];
+	}
+	// Get user data for Friend ID list array
+	$dbRes	= db_get_user_by_uid($mysqli, $data);
+	// Check result
+	if ($dbRes['result'] === false)
+	{
+		return $dbRes;
+	}
+	// Create friends list array
+	$data	= array();
+	foreach ($dbRes['payload'] as $value)
+	{
+		$data[$value['uid']]	= $value['lastname'] . ' ' . $value['name'];
+	}
+	// Store friends list array to cache
+	apcu_store($key, $data, $ttl);
 	// Return success
 	return array('result' => true, 'payload' => 'done');
 }

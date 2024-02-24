@@ -1,6 +1,6 @@
 ﻿<?php
 /**
-*	PHP | OTUS HLA | UTF8 | index.php
+*	PHP | OTUS HLA | UTF8 | friend.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
 *	2024-02-24
@@ -20,7 +20,7 @@ ini_set('logdbgs',					'On');
 ini_set('display_errors',			'On');
 ini_set('display_startup_errors',	'On');
 ini_set('log_errors',				'On');
-ini_set('error_log',				'index.error.log');
+ini_set('error_log',				'friend.error.log');
 
 //====================================================================== CONSTANTS
 define('ENDL',	chr(0x0D) . chr(0x0A));
@@ -35,16 +35,8 @@ require_once 'inc/tools.php';
 //====================================================================== VARIABLES
 $dbHandles		= array('write' => null, 'read' => null);
 $arrDbRes		= array('result' => false, 'payload' => 'initial');
-$responseMsg	= '';
-$responseHdr	= array();
 $tokenCookie	= $_COOKIE['token'];
-$tokenDb		= '';
-$token			= '';
 $userId			= 0;
-$usersCount		= 0;
-$timeStamp		= time();
-$sessionId		= 0;
-$sessionsCount	= 0;
 $apcuAvailabe	= false;
 
 //====================================================================== MAIN
@@ -65,15 +57,6 @@ if ($arrDbRes['result'] === false)
 {
 	page_break($dbHandles, '500 Internal Server Error', $arrDbRes['payload']);
 }
-// Init tables
-if (INSTALL === true)
-{
-	$arrDbRes	= db_table_init($dbHandles['write']);
-	if ($arrDbRes['result'] === false)
-	{
-		page_break($dbHandles, '500 Internal Server Error', $arrDbRes['payload']);
-	}
-}
 // Get user id by coockie token
 $arrDbRes	= db_get_session_by_token($dbHandles['read'], (empty($tokenCookie) ? 'nothing' : $tokenCookie));
 if ($arrDbRes['result'] === false)
@@ -85,35 +68,56 @@ if ($sessionsCount > 0)
 {
 	$userId	= intval($arrDbRes['payload'][0]['uid']);
 }
+// Session for user exist?
+if ($userId === 0)
+{
+	// Move to index.php
+	page_move_to($dbHandles, str_replace('friend.php', 'index.php', $_SERVER['SCRIPT_NAME']));
+}
 // Proccess GET param
-if (isset($_GET['login']))
+if (isset($_GET['add']))
 {
-	include 'inc/method.login.php';
-}
-else if (isset($_GET['adduser']))
-{
-	include 'inc/method.adduser.php';
-}
-else if (isset($_GET['search']) && $userId !== 0)
-{
-	include 'inc/method.search.php';
-}
-else if (isset($_GET['uid']) && $userId !== 0)
-{
-	include 'inc/method.uid.php';
-}
-else
-{
-	if ($userId === 0)
+	if (isset($_GET['id']))
 	{
-		// Move to ?login
-		page_move_to($dbHandles, $_SERVER['SCRIPT_NAME'] . '?login');
+		$arrDbRes	= db_add_friend_to_uid($dbHandles['write'], $userId, $_GET['id']);
+		if ($arrDbRes['result'] === false)
+		{
+			page_break($dbHandles, '400 Bad Request', $arrDbRes['payload']);
+		}
+		else
+		{
+			// Move to index.php
+			page_move_to($dbHandles, str_replace('friend.php', 'index.php', $_SERVER['SCRIPT_NAME']));
+		}
 	}
 	else
 	{
-		// Move to ?uid=
-		page_move_to($dbHandles, $_SERVER['SCRIPT_NAME'] . '?uid=' . $userId);
+		page_break($dbHandles, '400 Bad Request', 'Expected id param.');
 	}
+}
+else if (isset($_GET['delete']))
+{
+	if (isset($_GET['id']))
+	{
+		$arrDbRes	= db_delete_friend_from_uid($dbHandles['write'], $userId, $_GET['id']);
+		if ($arrDbRes['result'] === false)
+		{
+			page_break($dbHandles, '400 Bad Request', $arrDbRes['payload']);
+		}
+		else
+		{
+			// Move to index.php
+			page_move_to($dbHandles, str_replace('friend.php', 'index.php', $_SERVER['SCRIPT_NAME']));
+		}
+	}
+	else
+	{
+		page_break($dbHandles, '400 Bad Request', 'Expected id param.');
+	}
+}
+else
+{
+	page_break($dbHandles, '400 Bad Request', 'Expected add or delete param.');
 }
 // Close handle to db
 db_close($dbHandles);

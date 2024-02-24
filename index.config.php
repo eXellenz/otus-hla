@@ -14,6 +14,7 @@ if (!defined('ROOT'))
 }
 
 //====================================================================== CONSTANTS
+define('INSTALL',			false);						// First init
 define('DB_MASTER_HOST',	'localhost');				// The host/ip to your SQL server
 define('DB_MASTER_PORT',	'3306');					// The SQL port (Default: 3306)
 define('DB_SLAVE_HOST',		'localhost');				// The host/ip to your SQL server
