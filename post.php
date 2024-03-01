@@ -1,6 +1,6 @@
 ﻿<?php
 /**
-*	PHP | OTUS HLA | UTF8 | friend.php
+*	PHP | OTUS HLA | UTF8 | post.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
 *	2024-02-27
@@ -20,7 +20,7 @@ ini_set('logdbgs',					'On');
 ini_set('display_errors',			'On');
 ini_set('display_startup_errors',	'On');
 ini_set('log_errors',				'On');
-ini_set('error_log',				'friend.error.log');
+ini_set('error_log',				'post.error.log');
 
 //====================================================================== CONSTANTS
 define('ENDL',	chr(0x0D) . chr(0x0A));
@@ -72,20 +72,16 @@ if ($sessionsCount > 0)
 if ($userId === 0)
 {
 	// Move to index.php
-	page_move_to($dbHandles, str_replace('friend.php', 'index.php', $_SERVER['SCRIPT_NAME']));
+	page_move_to($dbHandles, str_replace('post.php', 'index.php', $_SERVER['SCRIPT_NAME']));
 }
 // Proccess GET param
-if (isset($_GET['add']))
+if (isset($_GET['create']))
 {
-	include 'inc/friend.add.php';
-}
-else if (isset($_GET['delete']))
-{
-	include 'inc/friend.delete.php';
+	include 'inc/post.create.php';
 }
 else
 {
-	page_break($dbHandles, '400 Bad Request', 'Expected add or delete param.');
+	include 'inc/post.get.php';
 }
 // Close handle to db
 db_close($dbHandles);

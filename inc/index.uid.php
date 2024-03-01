@@ -1,9 +1,9 @@
 ﻿<?php
 /**
-*	PHP | OTUS HLA | UTF8 | inc/method.uid.php
+*	PHP | OTUS HLA | UTF8 | inc/index.uid.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
-*	2024-02-24
+*	2024-02-27
 */
 
 //====================================================================== CHECK

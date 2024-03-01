@@ -2,7 +2,7 @@
 *	JS | OTUS HLA | UTF8 | js/scriptCheckForm.js
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
-*	2024-02-24
+*	2024-02-27
 */
 var elemRegForm			= $('#reg-form');
 var elemRegButton		= $('#reg-button');
@@ -20,6 +20,10 @@ var elemAuthLogin		= $('#auth-login');
 var elemAuthPassword	= $('#auth-password');
 var elemSearch			= $('#search-user');
 var elemSearchButton	= $('#search-button');
+var elemPostForm		= $('#post-form');
+var elemPostTitle		= $('#post-title');
+var elemPostText		= $('#post-text');
+var elemPostButton		= $('#post-button');
 
 $(document).ready(function()
 {
@@ -30,6 +34,10 @@ $(document).ready(function()
 	if (elemAuthForm)
 	{
 		elemAuthForm.submit(ValidateAuthFormSubmit);
+	}
+	if (elemPostForm)
+	{
+		elemPostForm.submit(ValidatePostFormSubmit);
 	}
 	if (elemSearchButton)
 	{
@@ -94,7 +102,7 @@ ValidateRegFormSubmit = function(e)
 	{
 		elemRegButton.prop('disabled', true);
 		elemRegForm.unbind('submit').submit();
-	} 
+	}
 }
 
 ValidateAuthFormSubmit = function(e)
@@ -123,7 +131,36 @@ ValidateAuthFormSubmit = function(e)
 	{
 		elemAuthButton.prop('disabled', true);
 		elemAuthForm.unbind('submit').submit();
-	} 
+	}
+}
+
+ValidatePostFormSubmit = function(e)
+{
+	e.preventDefault();
+
+	let validateIsOk	= true;
+	let	formMessage		= '';
+
+	if (!$.trim(elemPostTitle.val()))
+	{
+		validateIsOk = false;
+		formMessage += "Укажите Тему\r\n";
+	}
+	if (!$.trim(elemPostText.val()))
+	{
+		validateIsOk = false;
+		formMessage += "Укажите Сообщение\r\n";
+	}
+
+	if (validateIsOk == false)
+	{
+		alert(formMessage);
+	}
+	else
+	{
+		elemPostButton.prop('disabled', true);
+		elemPostForm.unbind('submit').submit();
+	}
 }
 
 CatchSearchUser = function()

@@ -3,7 +3,7 @@
 *	PHP | OTUS HLA | UTF8 | index.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
-*	2024-02-24
+*	2024-02-27
 */
 
 //====================================================================== INIT
@@ -88,19 +88,19 @@ if ($sessionsCount > 0)
 // Proccess GET param
 if (isset($_GET['login']))
 {
-	include 'inc/method.login.php';
+	include 'inc/index.login.php';
 }
 else if (isset($_GET['adduser']))
 {
-	include 'inc/method.adduser.php';
+	include 'inc/index.adduser.php';
 }
 else if (isset($_GET['search']) && $userId !== 0)
 {
-	include 'inc/method.search.php';
+	include 'inc/index.search.php';
 }
 else if (isset($_GET['uid']) && $userId !== 0)
 {
-	include 'inc/method.uid.php';
+	include 'inc/index.uid.php';
 }
 else
 {

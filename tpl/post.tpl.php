@@ -1,6 +1,6 @@
 ﻿<?php
 /**
-*	PHP | OTUS HLA | UTF8 | tpl/search.tpl.php
+*	PHP | OTUS HLA | UTF8 | tpl/post.tpl.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
 *	2024-02-27
@@ -12,13 +12,11 @@ if (!defined('ROOT'))
 	print 'Access denided.';
 	exit(0);
 }
-
-//====================================================================== MAIN
 ?>
 <!DOCTYPE html>
 <html lang="ru-RU">
 	<head>
-		<title>Search...</title>
+		<title>Post...</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<meta name="robots" content="noindex,nofollow">
 		<meta name="viewport" content="width=device-width,initial-scale=1">
@@ -27,29 +25,32 @@ if (!defined('ROOT'))
 	<body>
 		<div>
 			<p>
-				<a href="<?php echo $_SERVER['SCRIPT_NAME']; ?>">Домашняя</a>
-				<a href="<?php echo $_SERVER['SCRIPT_NAME'] . '?uid=' . $userId; ?>">Инфо о пользователе</a>
-				<a href="<?php echo $_SERVER['SCRIPT_NAME'] . '?login'; ?>">Авторизация</a>
+				<a href="<?php echo $_SERVER['SCRIPT_NAME'] . '?get'; ?>">Список</a>
 			</p>
 		</div>
 		<div>
-			<form id="search-form" enctype="multipart/form-data" method="POST" action="<?php echo $_SERVER['SCRIPT_NAME'] . '?search'; ?>">
+			<form id="post-form" enctype="multipart/form-data" method="POST" action="<?php echo $_SERVER['SCRIPT_NAME'] . '?create'; ?>">
 				<table>
 					<tr>
-						<td>Искать: </td>
+						<td>Тема: </td>
 						<td><span style="color: red;">*</span></td>
-						<td><input id="search-user" name="search-user" type="text" /></td>
+						<td><input id="post-title" name="post-title" type="text" /></td>
 					</tr>
 					<tr>
-						<td colspan="3"><button id="search-button" type="submit">Отправить</button></td>
+						<td>Сообщение: </td>
+						<td><span style="color: red;">*</span></td>
+						<td><textarea  id="post-text" name="post-text" type="text"></textarea></td>
+					</tr>
+					<tr>
+						<td colspan="3"><button id="post-button" type="submit">Отправить</button></td>
 					</tr>
 				</table>
 			</form>
 		</div>
 		<div>
-			<table>
-				<?php echo $userTable; ?>
-			</table>
+			<p>
+				<?php echo $pageWarnMsg; ?>
+			</p>
 		</div>
 		<script src="js/scriptCheckForm.js"></script>
 	</body>
