@@ -3,7 +3,7 @@
 *	PHP | OTUS HLA | UTF8 | index.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
-*	2024-02-27
+*	2024-03-06
 */
 
 //====================================================================== INIT
@@ -33,7 +33,7 @@ require_once 'index.config.php';
 require_once 'inc/tools.php';
 
 //====================================================================== VARIABLES
-$dbHandles		= array('write' => null, 'read' => null);
+$dbHandles		= array('write' => null, 'read' => null, 'sqlite' => null);
 $arrDbRes		= array('result' => false, 'payload' => 'initial');
 $responseMsg	= '';
 $responseHdr	= array();
@@ -73,17 +73,41 @@ if (INSTALL === true)
 	{
 		page_break($dbHandles, '500 Internal Server Error', $arrDbRes['payload']);
 	}
+
+	sqlite_init($dbHandles['read']);
+	sqlite_backup();
 }
-// Get user id by coockie token
-$arrDbRes	= db_get_session_by_token($dbHandles['read'], (empty($tokenCookie) ? 'nothing' : $tokenCookie));
+// Connect to sqlite
+$arrDbRes	= sqlite_connect($dbHandles);
 if ($arrDbRes['result'] === false)
 {
-	page_break($dbHandles, '400 Bad Request', $arrDbRes['payload']);
+	page_break($dbHandles, '500 Internal Server Error', $arrDbRes['payload']);
 }
-$sessionsCount	= count($arrDbRes['payload']);
-if ($sessionsCount > 0)
+// Get user id by coockie token
+if (!empty($tokenCookie))
 {
-	$userId	= intval($arrDbRes['payload'][0]['uid']);
+	if (SQLITE_USE)
+	{
+		$arrDbRes	= sqlite_get_session($dbHandles['sqlite'], $tokenCookie);
+	}
+	else
+	{
+		$arrDbRes	= db_get_session($dbHandles['read'], $tokenCookie);
+	}
+	if ($arrDbRes['result'] === false)
+	{
+		page_break($dbHandles, '400 Bad Request', $arrDbRes['payload']);
+	}
+
+	$sessionsCount	= count($arrDbRes['payload']);
+	if ($sessionsCount === 1)
+	{
+		$userId	= intval($arrDbRes['payload'][0]['uid']);
+	}
+	else if ($sessionsCount > 1)
+	{
+		page_break($dbHandles, '500 Internal Server Error', 'Found more when one user session!');
+	}
 }
 // Proccess GET param
 if (isset($_GET['login']))

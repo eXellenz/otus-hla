@@ -3,7 +3,7 @@
 *	PHP | OTUS HLA | UTF8 | inc/index.login.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
-*	2024-02-27
+*	2024-03-06
 */
 
 //====================================================================== CHECK
@@ -45,7 +45,14 @@ if (
 		{
 			// Check for session id existing in db
 			$userId		= intval($arrDbRes['payload'][0]['uid']);
-			$arrDbRes	= db_get_session_by_uid($dbHandles['read'], $userId);
+			if (SQLITE_USE)
+			{
+				$arrDbRes	= sqlite_get_session($dbHandles['sqlite'], '', $userId);
+			}
+			else
+			{
+				$arrDbRes	= db_get_session($dbHandles['read'], '', $userId);
+			}
 			if ($arrDbRes['result'] === false)
 			{
 				page_break($dbHandles, '400 Bad Request', $arrDbRes['payload']);
@@ -54,7 +61,14 @@ if (
 			$sessionsCount	= count($arrDbRes['payload']);
 			$sessionId		= ($sessionsCount == 0) ? 0 : intval($arrDbRes['payload'][0]['id']);
 			$token			= get_unique();
-			$arrDbRes		= db_set_session($dbHandles['write'], $userId, $timeStamp, $token, $sessionId);
+			if (SQLITE_USE)
+			{
+				$arrDbRes	= sqlite_set_session($dbHandles['sqlite'], $userId, $timeStamp, $token, $sessionId);
+			}
+			else
+			{
+				$arrDbRes	= db_set_session($dbHandles['write'], $userId, $timeStamp, $token, $sessionId);
+			}
 			// Set coockie for user
 			setcookie("token", $token, ($timeStamp + (3600 * 24)));
 			// Move user to index page

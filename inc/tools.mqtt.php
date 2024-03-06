@@ -3,7 +3,7 @@
 *	PHP | OTUS HLA | UTF8 | inc/tools.mqtt.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
-*	2024-02-27
+*	2024-03-06
 */
 
 //====================================================================== CHECK

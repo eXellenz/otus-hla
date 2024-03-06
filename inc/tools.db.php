@@ -3,7 +3,7 @@
 *	PHP | OTUS HLA | UTF8 | inc/tools.db.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
-*	2024-02-27
+*	2024-03-06
 */
 
 //====================================================================== CHECK
@@ -33,6 +33,11 @@ function db_connect(&$mysqliArr)
 			{
 				$host	= DB_SLAVE_HOST;
 				$port	= DB_SLAVE_PORT;
+				break;
+			}
+			case 'sqlite':
+			{
+				// nothing
 				break;
 			}
 			default:
@@ -85,7 +90,15 @@ function db_close(&$mysqliArr)
 	{
 		if ($mysqliArr[$key])
 		{
-			mysqli_close($mysqliArr[$key]);
+			if ($key === 'sqlite')
+			{
+				sqlite_close($mysqliArr[$key]);
+			}
+			else
+			{
+				mysqli_close($mysqliArr[$key]);
+			}
+
 			$mysqliArr[$key]	= null;
 		}
 	}
@@ -114,7 +127,7 @@ function db_table_init($mysqli)
 			case DB_TABLE_USERS:
 			{
 				$myQueryCreate	= "CREATE TABLE `" . $dbName . "` (" .
-								"`uid` integer NULL AUTO_INCREMENT COMMENT 'User ID'," .
+								"`uid` integer NOT NULL AUTO_INCREMENT COMMENT 'User ID'," .
 								"`login` varchar(64) NULL COMMENT 'User name'," .
 								"`password` varchar(64) NULL COMMENT 'User lastname'," .
 								"`name` varchar(64) NULL COMMENT 'User name'," .
@@ -129,7 +142,7 @@ function db_table_init($mysqli)
 			case DB_TABLE_SESSIONS:
 			{
 				$myQueryCreate	= "CREATE TABLE `" . $dbName . "` (" .
-								"`id` integer NULL AUTO_INCREMENT COMMENT 'ID записи'," .
+								"`id` integer NOT NULL AUTO_INCREMENT COMMENT 'ID записи'," .
 								"`uid` integer NULL COMMENT 'User ID'," .
 								"`timestamp` varchar(12) NULL COMMENT 'Session timestamp'," .
 								"`token` varchar(36) NULL COMMENT 'Session token'," .
@@ -139,7 +152,7 @@ function db_table_init($mysqli)
 			case DB_TABLE_FRIENDS:
 			{
 				$myQueryCreate	= "CREATE TABLE `" . $dbName . "` (" .
-								"`id` integer NULL AUTO_INCREMENT COMMENT 'ID записи'," .
+								"`id` integer NOT NULL AUTO_INCREMENT COMMENT 'ID записи'," .
 								"`timestamp` varchar(12) NULL COMMENT 'Add timestamp'," .
 								"`uid` integer NULL COMMENT 'User ID'," .
 								"`fid` integer NULL COMMENT 'Friend ID'," .
@@ -149,7 +162,7 @@ function db_table_init($mysqli)
 			case DB_TABLE_POSTS:
 			{
 				$myQueryCreate	= "CREATE TABLE `" . $dbName . "` (" .
-								"`id` integer NULL AUTO_INCREMENT COMMENT 'ID записи'," .
+								"`id` integer NOT NULL AUTO_INCREMENT COMMENT 'ID записи'," .
 								"`timestamp` varchar(12) NULL COMMENT 'Add timestamp'," .
 								"`uid` integer NULL COMMENT 'User ID'," .
 								"`title` varchar(128) NULL COMMENT 'Post title'," .
@@ -160,7 +173,7 @@ function db_table_init($mysqli)
 			case DB_TABLE_DIALOGS:
 			{
 				$myQueryCreate	= "CREATE TABLE `" . $dbName . "` (" .
-								"`id` integer NULL AUTO_INCREMENT COMMENT 'ID записи'," .
+								"`id` integer NOT NULL AUTO_INCREMENT COMMENT 'ID записи'," .
 								"`timestamp` varchar(12) NULL COMMENT 'Add timestamp'," .
 								"`uid` integer NULL COMMENT 'User ID'," .
 								"`tid` integer NULL COMMENT 'Target ID'," .
@@ -438,15 +451,30 @@ function db_set_session($mysqli, $uid, $timestamp, $token, $id = 0)
 	return array('result' => true, 'payload' => 'done');
 }
 
-function db_get_session_by_token($mysqli, $rawToken)
+function db_get_session($mysqli, $rawToken = '', $rawUid = '')
 {
-	$token	= mysqli_real_escape_string($mysqli, $rawToken);
-	$data	= array();
-	// Request for getting data from table
+	$data		= array();
 	$myQuery	= "SELECT `id`, `uid`, `timestamp`, `token` " .
-				"FROM `". DB_TABLE_SESSIONS ."` " .
-				"WHERE `token` = '" . $token . "' " .
-				"ORDER BY `uid`";
+				"FROM `" . DB_TABLE_SESSIONS . "`";
+	// Check selection filter
+	if (empty($rawToken) && empty($rawUid))
+	{
+		$myQuery	.= " ORDER BY `id` ASC";
+	}
+	else if (!empty($rawToken) && !empty($rawUid))
+	{
+		$myQuery	.= " WHERE `token` = '" . mysqli_real_escape_string($mysqli, $rawToken) . "'" .
+					" AND `uid` = '" . mysqli_real_escape_string($mysqli, $rawUid) . "'";
+	}
+	else if (!empty($rawToken))
+	{
+		$myQuery	.= " WHERE `token` = '" . mysqli_real_escape_string($mysqli, $rawToken) . "'";
+	}
+	else if (!empty($rawUid))
+	{
+		$myQuery	.= " WHERE `uid` = '" . mysqli_real_escape_string($mysqli, $rawUid) . "'";
+	}
+	// Request for getting data from table
 	$result		= mysqli_query($mysqli, $myQuery);
 	if ($result === false)
 	{
@@ -478,13 +506,14 @@ function db_get_session_by_token($mysqli, $rawToken)
 	return array('result' => true, 'payload' => $data);
 }
 
-function db_get_session_by_uid($mysqli, $uid)
+function db_get_session_by_token($mysqli, $rawToken)
 {
+	$token	= mysqli_real_escape_string($mysqli, $rawToken);
 	$data	= array();
 	// Request for getting data from table
 	$myQuery	= "SELECT `id`, `uid`, `timestamp`, `token` " .
 				"FROM `". DB_TABLE_SESSIONS ."` " .
-				"WHERE `uid` = " . $uid . " " .
+				"WHERE `token` = '" . $token . "' " .
 				"ORDER BY `uid`";
 	$result		= mysqli_query($mysqli, $myQuery);
 	if ($result === false)

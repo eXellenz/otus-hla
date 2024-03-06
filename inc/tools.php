@@ -3,7 +3,7 @@
 *	PHP | OTUS HLA | UTF8 | inc/tools.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
-*	2024-02-27
+*	2024-03-06
 */
 
 //====================================================================== CHECK
@@ -17,6 +17,7 @@ if (!defined('ROOT'))
 require_once 'inc/tools.db.php';
 require_once 'inc/tools.cache.php';
 require_once 'inc/tools.mqtt.php';
+require_once 'inc/tools.sqlite.php';
 
 //====================================================================== FUNCTIONS
 function page_move_to(&$mysqliArr, $url)
