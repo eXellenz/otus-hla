@@ -3,7 +3,7 @@
 *	PHP | OTUS HLA | UTF8 | load_sql.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
-*	2024-01-27
+*	2024-03-06
 */
 
 //====================================================================== INIT
@@ -24,33 +24,31 @@ ini_set('log_errors',				'On');
 ini_set('error_log',				'load_sql.error.log');
 
 //====================================================================== CONSTANTS
-define('ENDL',				chr(0x0D) . chr(0x0A));
-define('DB_HOST',			'localhost');			// The host/ip to your SQL server
-define('DB_PORT',			'3306');					// The SQL port (Default: 3306)
-define('DB_USER',			'user');				// The username
-define('DB_PASS',			'usersecret');		// The password
-define('DB_NAME',			'otushlahwdb');				// Database name
-define('DB_PREFIX',			'otushlahw_');				// The table prefix
-define('DB_CHARSET',		'utf8');					// Database charset
-define('DB_TABLE_TEST',		DB_PREFIX . 'test');		// Table name
+define('ENDL',	chr(0x0D) . chr(0x0A));
+define('ROOT',	'82832e53-7524-fa24-8519-b82f7d1d451f');
 
 //====================================================================== DEPENDENCIES
+require_once 'index.config.php';
+require_once 'inc/tools.php';
 
 
 //====================================================================== VARIABLES
 $requestUri	= $_SERVER['REQUEST_URI'];
-$time		= time();
-$curTime	= time();
+$time		= 0;
+$curTime	= 0;
 $cycleTime	= 30;
 $mysqli		= null;
+$sqlite		= null;
 $result		= false;
+$count		= 0;
 $echo		= '';
 
 //====================================================================== MAIN
 // Run over CLI
 if (empty($requestUri))
 {
-	$result	= db_connect($mysqli);
+	$sqlite	= new SQLite3(SQLITE_DB, SQLITE3_OPEN_READWRITE);
+	$result	= db_connect_local($mysqli);
 	if ($result['result'] === false)
 	{
 		$echo	= $result['payload'] . ENDL;
@@ -59,20 +57,64 @@ if (empty($requestUri))
 	}
 	else
 	{
+		// write test
+	/*	$time		= time();
+		$curTime	= time();
+		$count		= 0;
 		while ($curTime < ($time + $cycleTime))
 		{
 			$result	= db_add_record($mysqli);
 			if ($result['result'] === false)
 			{
 				$echo	= $result['payload'] . ENDL;
-				print $echo;
+				print $echo . PHP_EOL;
 				file_put_contents('load_sql.error.log', $echo, FILE_APPEND);
 			}
 
+			$count ++;
+			$curTime	= time();
+		}*/
+		// read mysql test
+		$time		= time();
+		$curTime	= time();
+		$count		= 0;
+		while ($curTime < ($time + $cycleTime))
+		{
+			$rnd	= rand(1, 4);
+			$result	= db_get_session($mysqli, '', $rnd);
+			if ($result['result'] === false)
+			{
+				$echo	= $result['payload'] . ENDL;
+				print $echo . PHP_EOL;
+				file_put_contents('load_sql.error.log', $echo, FILE_APPEND);
+			}
+
+			$count ++;
 			$curTime	= time();
 		}
+		print 'mysql count: ' . $count . PHP_EOL;
+		// read sqlite test
+		$time		= time();
+		$curTime	= time();
+		$count		= 0;
+		while ($curTime < ($time + $cycleTime))
+		{
+			$rnd	= rand(1, 4);
+			$result	= sqlite_get_session($sqlite, '', $rnd);
+			if ($result['result'] === false)
+			{
+				$echo	= $result['payload'] . ENDL;
+				print $echo . PHP_EOL;
+				file_put_contents('load_sql.error.log', $echo, FILE_APPEND);
+			}
 
-		db_close($mysqli);
+			$count ++;
+			$curTime	= time();
+		}
+		print 'sqlite count: ' . $count . PHP_EOL;
+
+		db_close_local($mysqli);
+		sqlite_close($sqlite);
 	}
 }
 else
@@ -84,17 +126,17 @@ else
 prompt_ex('Press ENTER for exit ...');
 
 //====================================================================== FUNCTIONS
-function db_connect(&$mysqli)
+function db_connect_local(&$mysqli)
 {
 	// Connecting to db
-	$mysqli	= mysqli_connect(DB_HOST . ':' . DB_PORT, DB_USER, DB_PASS);
+	$mysqli	= mysqli_connect(DB_MASTER_HOST . ':' . DB_MASTER_PORT, DB_USER, DB_PASS);
 	$result	= mysqli_connect_errno();
 	if ($result !== 0)
 	{
 		// Get mysqli error description
 		$queryError	= mysqli_connect_error();
 		// Close handle to db
-		if ($mysqli) db_close($mysqli);
+		if ($mysqli) db_close_local($mysqli);
 		// Return error description
 		return array('result' => false, 'payload' => 'Ошибка подключения к БД. Описание: '. $queryError);
 	}
@@ -105,7 +147,7 @@ function db_connect(&$mysqli)
 		// Get mysqli error description
 		$queryError	= mysqli_error($mysqli);
 		// Close handle to db
-		if ($mysqli) db_close($mysqli);
+		if ($mysqli) db_close_local($mysqli);
 		// Return error description
 		return array('result' => false, 'payload' => 'Ошибка установка кодировки БД. Описание: '. $queryError);
 	}
@@ -116,7 +158,7 @@ function db_connect(&$mysqli)
 		// Get mysqli error description
 		$queryError	= mysqli_error($mysqli);
 		// Close handle to db
-		if ($mysqli) db_close($mysqli);
+		if ($mysqli) db_close_local($mysqli);
 		// Return error description
 		return array('result' => false, 'payload' => 'Ошибка подключения к ['. DB_NAME .']. Описание: '. $queryError);
 	}
@@ -138,7 +180,7 @@ function db_connect(&$mysqli)
 			// Get mysqli error description
 			$queryError	= mysqli_error($mysqli);
 			// Close handle to db
-			if ($mysqli) db_close($mysqli);
+			if ($mysqli) db_close_local($mysqli);
 			// Return error description
 			return array('result' => false, 'payload' => 'Ошибка создания ['. DB_TABLE_TEST .']. Описание: '. $queryError);
 		}
@@ -149,7 +191,7 @@ function db_connect(&$mysqli)
 	return array('result' => true, 'payload' => 'done');
 }
 
-function db_close(&$mysqli)
+function db_close_local(&$mysqli)
 {
 	mysqli_close($mysqli);
 	$mysqli	= null;
