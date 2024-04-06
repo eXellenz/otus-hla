@@ -19,7 +19,7 @@ ini_set('log_errors',				'On');
 ini_set('error_log',				'apitest.error.log');
 
 //====================================================================== CONSTANTS
-define('URL',		'https://skurat.ru/main/otus-hla/');
+define('URL',		'https://example.com/');
 define('API',		URL . 'api.php?method=');
 define('LOGIN',		'user');
 define('PASSWORD',	'password');
