@@ -1,9 +1,9 @@
-﻿<?php
+<?php
 /**
 *	PHP | OTUS HLA | UTF8 | index.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
-*	2024-03-06
+*	2024-04-06
 */
 
 //====================================================================== INIT
@@ -78,10 +78,13 @@ if (INSTALL === true)
 	sqlite_backup();
 }
 // Connect to sqlite
-$arrDbRes	= sqlite_connect($dbHandles);
-if ($arrDbRes['result'] === false)
+if (SQLITE_USE)
 {
-	page_break($dbHandles, '500 Internal Server Error', $arrDbRes['payload']);
+	$arrDbRes	= sqlite_connect($dbHandles);
+	if ($arrDbRes['result'] === false)
+	{
+		page_break($dbHandles, '500 Internal Server Error', $arrDbRes['payload']);
+	}
 }
 // Get user id by coockie token
 if (!empty($tokenCookie))

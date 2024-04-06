@@ -1,9 +1,9 @@
-﻿<?php
+<?php
 /**
-*	PHP | OTUS HLA | UTF8 | friend.php
+*	PHP | OTUS HLA | UTF8 | index.friend.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
-*	2024-03-06
+*	2024-04-06
 */
 
 //====================================================================== INIT
@@ -93,16 +93,16 @@ if (!empty($tokenCookie))
 if ($userId === 0)
 {
 	// Move to index.php
-	page_move_to($dbHandles, str_replace('friend.php', 'index.php', $_SERVER['SCRIPT_NAME']));
+	page_move_to($dbHandles, str_replace('index.friend.php', 'index.php', $_SERVER['SCRIPT_NAME']));
 }
 // Proccess GET param
 if (isset($_GET['add']))
 {
-	include 'inc/friend.add.php';
+	include 'inc/index.friend.add.php';
 }
 else if (isset($_GET['delete']))
 {
-	include 'inc/friend.delete.php';
+	include 'inc/index.friend.delete.php';
 }
 else
 {

@@ -1,6 +1,6 @@
 <?php
 /**
-*	PHP | OTUS HLA | UTF8 | index.config.php
+*	PHP | OTUS HLA | UTF8 | api.config.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
 *	2024-02-24

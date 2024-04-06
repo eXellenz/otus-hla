@@ -1,9 +1,9 @@
-﻿<?php
+<?php
 /**
 *	PHP | OTUS HLA | UTF8 | tpl/uid.tpl.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
-*	2024-03-06
+*	2024-04-06
 */
 
 //====================================================================== CHECK

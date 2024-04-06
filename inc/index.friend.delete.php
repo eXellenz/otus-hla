@@ -1,9 +1,9 @@
-﻿<?php
+<?php
 /**
-*	PHP | OTUS HLA | UTF8 | inc/friend.add.php
+*	PHP | OTUS HLA | UTF8 | inc/index.friend.delete.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
-*	2024-03-06
+*	2024-04-06
 */
 
 //====================================================================== CHECK
@@ -16,7 +16,7 @@ if (!defined('ROOT'))
 //====================================================================== MAIN
 if (isset($_GET['id']))
 {
-	$arrDbRes	= db_add_friend_to_uid($dbHandles['write'], $userId, $_GET['id']);
+	$arrDbRes	= db_delete_friend_from_uid($dbHandles['write'], $userId, $_GET['id']);
 	if ($arrDbRes['result'] === false)
 	{
 		page_break($dbHandles, '400 Bad Request', $arrDbRes['payload']);
@@ -24,7 +24,7 @@ if (isset($_GET['id']))
 	else
 	{
 		// Move to index.php
-		page_move_to($dbHandles, str_replace('friend.php', 'index.php', $_SERVER['SCRIPT_NAME']));
+		page_move_to($dbHandles, str_replace('index.friend.php', 'index.php', $_SERVER['SCRIPT_NAME']));
 	}
 }
 else

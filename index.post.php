@@ -1,9 +1,9 @@
-﻿<?php
+<?php
 /**
-*	PHP | OTUS HLA | UTF8 | post.php
+*	PHP | OTUS HLA | UTF8 | index.post.php
 *	Home work
 *	eXellenz (eXellenz@inbox.ru)
-*	2024-03-06
+*	2024-04-06
 */
 
 //====================================================================== INIT
@@ -93,16 +93,16 @@ if (!empty($tokenCookie))
 if ($userId === 0)
 {
 	// Move to index.php
-	page_move_to($dbHandles, str_replace('post.php', 'index.php', $_SERVER['SCRIPT_NAME']));
+	page_move_to($dbHandles, str_replace('index.post.php', 'index.php', $_SERVER['SCRIPT_NAME']));
 }
 // Proccess GET param
 if (isset($_GET['create']))
 {
-	include 'inc/post.create.php';
+	include 'inc/index.post.create.php';
 }
 else
 {
-	include 'inc/post.get.php';
+	include 'inc/index.post.get.php';
 }
 // Close handle to db
 db_close($dbHandles);
